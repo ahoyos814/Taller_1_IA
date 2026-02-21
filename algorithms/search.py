@@ -53,8 +53,44 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """
     Search the node that has the lowest combined cost and heuristic first.
     """
-    # TODO: Add your code here
-    utils.raiseNotDefined()
+    # Estado inicial del problema
+    start_state = problem.getStartState()
+
+    # Caso trivial: ya estamos en la meta
+    if problem.isGoalState(start_state):
+        return []
+
+    # Frontera priorizada por f(n) = g(n) + h(n)
+    frontier = utils.PriorityQueue()
+    frontier.push((start_state, [], 0), heuristic(start_state, problem))
+
+    # Mejor costo real g(n) encontrado hasta ahora para cada estado
+    cost_so_far = {start_state: 0}
+
+    while not frontier.isEmpty():
+        state, path, path_cost = frontier.pop()
+
+        # Ignoramos entradas obsoletas de la frontera (ya existe un mejor g para este estado)
+        if path_cost > cost_so_far.get(state, float("inf")):
+            continue
+
+        # Cuando llegamos a meta, devolvemos la secuencia de acciones
+        if problem.isGoalState(state):
+            return path
+
+        # Expandimos sucesores y relajamos costos
+        for successor, action, step_cost in problem.getSuccessors(state):
+            new_cost = path_cost + step_cost
+
+            # Solo actualizamos si encontramos un camino más barato al sucesor
+            if new_cost < cost_so_far.get(successor, float("inf")):
+                cost_so_far[successor] = new_cost
+                new_path = path + [action]
+                priority = new_cost + heuristic(successor, problem)
+                frontier.push((successor, new_path, new_cost), priority)
+
+    # Si no hay solución alcanzable
+    return []
 
 
 # Abbreviations (you can use them for the -f option in main.py)
