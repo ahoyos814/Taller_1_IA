@@ -44,7 +44,6 @@ def uniformCostSearch(problem: SearchProblem):
     """
     Search the node of least total cost first.
     """
-
     # TODO: Add your code here
     utils.raiseNotDefined()
 
@@ -53,43 +52,42 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """
     Search the node that has the lowest combined cost and heuristic first.
     """
-    # Estado inicial del problema
-    start_state = problem.getStartState()
+    # Se pone el estado inicial
+    inicio = problem.getStartState()
 
-    # Caso trivial: ya estamos en la meta
-    if problem.isGoalState(start_state):
+    # Caso donde ya estoy en la meta
+    if problem.isGoalState(inicio):
         return []
 
-    # Frontera priorizada por f(n) = g(n) + h(n)
-    frontier = utils.PriorityQueue()
-    frontier.push((start_state, [], 0), heuristic(start_state, problem))
+    # frontera que evalua la prioridad de A* que es: g(n) + h(n)
+    frontera = utils.PriorityQueue()
+    frontera.push((inicio, [], 0), heuristic(inicio, problem))
 
-    # Mejor costo real g(n) encontrado hasta ahora para cada estado
-    cost_so_far = {start_state: 0}
+    #Guarda el mejor costo que se puede obtener
+    mejor_costo = {inicio: 0}
 
-    while not frontier.isEmpty():
-        state, path, path_cost = frontier.pop()
+    while not frontera.isEmpty():
+        estado, camino, costo_camino = frontera.pop()
 
-        # Ignoramos entradas obsoletas de la frontera (ya existe un mejor g para este estado)
-        if path_cost > cost_so_far.get(state, float("inf")):
+        # En el caso de que sea peor que el mejor costo conocido no se expande
+        if costo_camino > mejor_costo.get(estado, float("inf")):
             continue
 
-        # Cuando llegamos a meta, devolvemos la secuencia de acciones
-        if problem.isGoalState(state):
-            return path
+        # si es la meta se retorna el camino
+        if problem.isGoalState(estado):
+            return camino
 
-        # Expandimos sucesores y relajamos costos
-        for successor, action, step_cost in problem.getSuccessors(state):
-            new_cost = path_cost + step_cost
+        # expanden los sucesores
+        for sucesor, accion, costo_paso in problem.getSuccessors(estado):
+            nuevo_costo = costo_camino + costo_paso
 
-            # Solo actualizamos si encontramos un camino más barato al sucesor
-            if new_cost < cost_so_far.get(successor, float("inf")):
-                cost_so_far[successor] = new_cost
-                new_path = path + [action]
-                priority = new_cost + heuristic(successor, problem)
-                frontier.push((successor, new_path, new_cost), priority)
+            # se actualiza si se encuentra un camino mejor
+            if nuevo_costo < mejor_costo.get(sucesor, float("inf")):
+                mejor_costo[sucesor] = nuevo_costo
+                prioridad = nuevo_costo + heuristic(sucesor, problem)
+                frontera.push((sucesor, camino + [accion], nuevo_costo), prioridad)
 
-    # Si no hay solución alcanzable
+    # En tal caso de que no se encuentre solución, se retorna una lista vacía
     return []
 
 

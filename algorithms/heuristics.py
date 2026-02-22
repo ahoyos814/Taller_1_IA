@@ -16,42 +16,40 @@ def manhattanHeuristic(state, problem):
     """
     The Manhattan distance heuristic.
     """
-    # Intentamos obtener la meta desde el problema (SimpleSurvivorProblem usa problem.goal)
-    goal = None
-    if hasattr(problem, "goal"):
-        goal = problem.goal
-    elif hasattr(problem, "getGoalState") and callable(problem.getGoalState):
-        goal = problem.getGoalState()
+    # Obtengo la meta del problema
+    meta = getattr(problem, "goal", None)
 
-    # Si por alguna razón no hay meta disponible, devolvemos heurística neutra
-    if goal is None:
+    # Obtener la meta del problema en caso de NOne
+    if meta is None and hasattr(problem, "getGoalState") and callable(problem.getGoalState):
+        meta = problem.getGoalState()
+
+    # Si no logro obtener meta, devuelvo 0 como si no tuviera heuristica 0
+    if meta is None:
         return 0
 
-    # Distancia Manhattan: movimientos ortogonales en grilla
+    # Distancia Manhattan calculado como |x1-x2| + |y1-y2|
     x, y = state
-    goal_x, goal_y = goal
-    return abs(x - goal_x) + abs(y - goal_y)
+    mx, my = meta
+    return abs(x - mx) + abs(y - my)
 
 
 def euclideanHeuristic(state, problem):
     """
     The Euclidean distance heuristic.
     """
-    # Intentamos obtener la meta desde el problema
-    goal = None
-    if hasattr(problem, "goal"):
-        goal = problem.goal
-    elif hasattr(problem, "getGoalState") and callable(problem.getGoalState):
-        goal = problem.getGoalState()
+    # Se obtiene la meta del problema
+    meta = getattr(problem, "goal", None)
+    if meta is None and hasattr(problem, "getGoalState") and callable(problem.getGoalState):
+        meta = problem.getGoalState()
 
-    # Si no hay meta definida, no estimamos costo restante
-    if goal is None:
+    # En tal caso de que la meta siga siendo None se retorna 0
+    if meta is None:
         return 0
 
-    # Distancia Euclidiana: línea recta entre estado actual y objetivo
+    # Distancia Euclidiana: raiz(dx^2 + dy^2)
     x, y = state
-    goal_x, goal_y = goal
-    return math.sqrt((x - goal_x) ** 2 + (y - goal_y) ** 2)
+    mx, my = meta
+    return math.sqrt((x - mx) ** 2 + (y - my) ** 2)
 
 
 def survivorHeuristic(state: Tuple[Tuple, Any], problem: MultiSurvivorProblem):
