@@ -44,8 +44,95 @@ def uniformCostSearch(problem: SearchProblem):
     """
     Search the node of least total cost first.
     """
-    # TODO: Add your code here
-    utils.raiseNotDefined()
+
+    # =====================================================================
+    # PRIMERA VERSION (sin IA)
+    # la idea es como un bfs pero en vez de expandir por niveles
+    # expandimos el nodo que tenga menor costo acumulado
+    # usamos la PriorityQueue de utils para eso
+    # =====================================================================
+    #
+    # inicio = problem.getStartState()
+    #
+    # # cola de prioridad, metemos el estado con su camino y costo
+    # cola = utils.PriorityQueue()
+    # cola.push((inicio, [], 0), 0)
+    #
+    # visitados = set()
+    #
+    # while not cola.isEmpty():
+    #     nodo, acciones, costo = cola.pop()
+    #
+    #     if nodo in visitados:
+    #         continue
+    #
+    #     visitados.add(nodo)
+    #
+    #     # si es la meta retornamos las acciones
+    #     if problem.isGoalState(nodo):
+    #         return acciones
+    #
+    #     # recorremos los vecinos
+    #     for siguiente, accion, paso in problem.getSuccessors(nodo):
+    #         if siguiente not in visitados:
+    #             nuevo = costo + paso
+    #             cola.push((siguiente, acciones + [accion], nuevo), nuevo)
+    #
+    # return []
+    #
+    # =====================================================================
+    # FIN PRIMERA VERSION
+    # =====================================================================
+
+    # =====================================================================
+    # PROMPT 1:
+    # "tengo este codigo de uniform cost search pero tengo una duda,
+    # que pasa si el robot ya esta en la posicion del sobreviviente
+    # desde el inicio? y tambien, hay alguna forma de que sea mas
+    # eficiente? porque con el set de visitados siento que podria
+    # no encontrar el camino mas barato siempre"
+    #
+    # RESPUESTA IA:
+    # - agregar chequeo al inicio por si el estado inicial ya es meta
+    # - cambiar el set de visitados por un diccionario que guarde el
+    #   mejor costo conocido, asi si encontramos un camino mas barato
+    #   a un nodo lo podemos actualizar
+    # =====================================================================
+
+    # VERSION FINAL
+
+    inicio = problem.getStartState()
+
+    # chequeo edge case: si ya estamos en la meta no nos movemos
+    if problem.isGoalState(inicio):
+        return []
+
+    # cola de prioridad, la prioridad es el costo acumulado
+    cola = utils.PriorityQueue()
+    cola.push((inicio, [], 0), 0)
+
+    # en vez de un set usamos diccionario para guardar el mejor costo a cada nodo
+    mejor_costo = {inicio: 0}
+
+    while not cola.isEmpty():
+        nodo, acciones, costo = cola.pop()
+
+        # si ya hay un camino mas barato a este nodo, lo saltamos
+        if costo > mejor_costo.get(nodo, float("inf")):
+            continue
+
+        if problem.isGoalState(nodo):
+            return acciones
+
+        for siguiente, accion, paso in problem.getSuccessors(nodo):
+            nuevo_costo = costo + paso
+
+            # solo lo metemos si es mejor que lo que ya teniamos
+            if nuevo_costo < mejor_costo.get(siguiente, float("inf")):
+                mejor_costo[siguiente] = nuevo_costo
+                cola.push((siguiente, acciones + [accion], nuevo_costo), nuevo_costo)
+
+    return []
 
 
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
