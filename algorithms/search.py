@@ -28,16 +28,70 @@ def depthFirstSearch(problem: SearchProblem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    # TODO: Add your code here
-    utils.raiseNotDefined()
+    # Pila LIFO: expande primero el nodo más profundo descubierto.
+    frontera = utils.Stack()
+    estado_inicial = problem.getStartState()
+
+    # Cada elemento de la frontera es: (estado, lista_de_acciones_hasta_ese_estado).
+    frontera.push((estado_inicial, []))
+
+    # Conjunto de estados ya expandidos para evitar ciclos.
+    visitados = set()
+
+    while not frontera.isEmpty():
+        # Sacamos el último estado agregado a la pila.
+        estado, acciones = frontera.pop()
+
+        # Si alcanzamos la meta, devolvemos el camino de acciones.
+        if problem.isGoalState(estado):
+            return acciones
+
+        # Si ya se expandió este estado, lo saltamos.
+        if estado in visitados:
+            continue
+
+        # Marcamos como visitado justo cuando lo expandimos.
+        visitados.add(estado)
+
+        # Agregamos sucesores no visitados para seguir profundizando.
+        for sucesor, accion, _ in problem.getSuccessors(estado):
+            if sucesor not in visitados:
+                frontera.push((sucesor, acciones + [accion]))
+
+    # Si no hay solución, retornamos lista vacía.
+    return [] 
 
 
 def breadthFirstSearch(problem: SearchProblem):
     """
     Search the shallowest nodes in the search tree first.
     """
-    # TODO: Add your code here
-    utils.raiseNotDefined()
+    # Cola FIFO: expande primero los nodos más cercanos al estado inicial.
+    frontera = utils.Queue()
+    estado_inicial = problem.getStartState()
+
+    # Cada elemento de la frontera es: (estado, lista_de_acciones_hasta_ese_estado).
+    frontera.push((estado_inicial, []))
+
+    # En BFS marcamos visitado al encolar para no duplicar estados en la cola.
+    visitados = {estado_inicial}
+
+    while not frontera.isEmpty():
+        # Sacamos el estado más antiguo en la cola (orden por niveles).
+        estado, acciones = frontera.pop()
+
+        # Si llegamos al objetivo, devolvemos el camino de acciones.
+        if problem.isGoalState(estado):
+            return acciones
+
+        # Expandimos sucesores no visitados y los encolamos al final.
+        for sucesor, accion, _ in problem.getSuccessors(estado):
+            if sucesor not in visitados:
+                visitados.add(sucesor)
+                frontera.push((sucesor, acciones + [accion]))
+
+    # Si no existe solución, retornamos lista vacía.
+    return []
 
 
 def uniformCostSearch(problem: SearchProblem):
