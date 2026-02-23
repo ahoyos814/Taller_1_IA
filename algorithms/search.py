@@ -193,6 +193,65 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """
     Search the node that has the lowest combined cost and heuristic first.
     """
+
+      # =====================================================================
+    # PRIMERA VERSION (la de prueba, bien basica)
+    # la idea era simple:
+    # A* escoge el nodo con menor valor de f(n) = g(n) + h(n)
+    # g(n) = costo acumulado
+    # h(n) = heuristica
+    # =====================================================================
+    #
+    # inicio = problem.getStartState()
+    #
+    # # cola con prioridad para sacar siempre el que tenga menor f
+    # cola = utils.PriorityQueue()
+    # cola.push((inicio, [], 0), heuristic(inicio, problem))
+    #
+    # visitados = set()
+    #
+    # while not cola.isEmpty():
+    #     nodo, acciones, costo = cola.pop()
+    #
+    #     if nodo in visitados:
+    #         continue
+    #
+    #     visitados.add(nodo)
+    #
+    #     # si llegamos al objetivo devolvemos el camino
+    #     if problem.isGoalState(nodo):
+    #         return acciones
+    #
+    #     # expandimos vecinos
+    #     for siguiente, accion, paso in problem.getSuccessors(nodo):
+    #         if siguiente not in visitados:
+    #             nuevo_costo = costo + paso
+    #             prioridad = nuevo_costo + heuristic(siguiente, problem)
+    #             cola.push((siguiente, acciones + [accion], nuevo_costo), prioridad)
+    #
+    # return []
+    #
+    # =====================================================================
+    # FIN PRIMERA VERSION
+    # =====================================================================
+
+    # =====================================================================
+    # PROMPT 1:
+    # "oye, el A* ya corre pero me surgieron dos cositas:
+    #  1) si apenas arranca ya estamos en la meta, igual deberia buscar?
+    #  2) con visitados como set, no se me puede quedar por fuera
+    #     un camino mas barato que aparezca despues?"
+    #
+    # RESPUESTA IA:
+    # - hacer validacion al inicio: si inicio ya es meta, devolver []
+    # - cambiar visitados(set) por mejor_costo(dict)
+    # - si llega un estado con costo peor al guardado, se descarta
+    # - si llega con mejor costo, se actualiza y se mete otra vez en la cola
+    # =====================================================================
+
+    # VERSION FINAL
+
+
     # Se pone el estado inicial
     inicio = problem.getStartState()
 
