@@ -67,5 +67,97 @@ def survivorHeuristic(state: Tuple[Tuple, Any], problem: MultiSurvivorProblem):
     - Consider: distance to nearest survivor + MST of remaining survivors
     - Balance heuristic strength vs. computation time (do experiments!)
     """
-    # TODO: Add your code here
-    utils.raiseNotDefined()
+    #Versión 1
+    #heuristica h(n) = max(manhattan(agente, sobrevivientes)) 
+    """ 
+     position, survivors_grid = state
+    agent_x, agent_y = position
+    
+    max_distance = 0
+    for x in range(survivors_grid.width):
+        for y in range(survivors_grid.height):
+            if survivors_grid[x][y]:  
+                manhattan_dist = abs(agent_x - x) + abs(agent_y - y)
+                max_distance = max(max_distance, manhattan_dist)
+    
+    return max_distance
+    """
+    #Versión 2
+    # h(n) = min(manhattan(agente, sobreviviente)) + max(manhattan(agente, sobreviviente))
+    
+    """  
+       position, survivors_grid = state
+    agent_x, agent_y = position
+    
+    min_distance = float('inf')
+    max_distance = 0
+    
+    for x in range(survivors_grid.width):
+        for y in range(survivors_grid.height):
+            if survivors_grid[x][y]:  
+                manhattan_dist = abs(agent_x - x) + abs(agent_y - y)
+                min_distance = min(min_distance, manhattan_dist)
+                max_distance = max(max_distance, manhattan_dist)
+    
+    # If no survivors, return 0
+    if min_distance == float('inf'):
+        return 0
+    
+    return min_distance + max_distance
+    """
+
+    #Versión final
+    # h(n) = distancia(agente, sobreviviente más cercano) + MST(sobrevivientes restantes)  
+    
+    position, survivors_grid = state
+    agent_x, agent_y = position
+    
+    # Obtener la lista de sobrevivientes a partir de survivors_grid
+    survivors = []
+    for x in range(survivors_grid.width):
+        for y in range(survivors_grid.height):
+            if survivors_grid[x][y]:
+                survivors.append((x, y))
+    
+    # Si no hay sobrevivientes, el costo es 0
+    if not survivors:
+        return 0
+    
+    # Calcular la distancia Manhattan al sobreviviente más cercano
+    min_distance = float('inf')
+    for survivor_x, survivor_y in survivors:
+        dist = abs(agent_x - survivor_x) + abs(agent_y - survivor_y)
+        min_distance = min(min_distance, dist)
+    
+    # Calcular el costo del MST de los sobrevivientes, usando caching para evitar cálculos repetidos
+    tupla_survivors = tuple(sorted(survivors))
+    if tupla_survivors not in problem.heuristicInfo:
+        # Calcular MST usando Prim's algorithm
+        if len(survivors) <= 1:
+            mst_costos = 0
+        else:
+            visitados = {survivors[0]}
+            mst_costos = 0
+            
+            while len(visitados) < len(survivors):
+                min_edge = float('inf')
+                next_survivor = None
+                
+                # Encontrar la frontera más barata que conecta un sobreviviente visitado con uno no visitado
+                for v in visitados:
+                    for u in survivors:
+                        if u not in visitados:
+                            dist = abs(v[0] - u[0]) + abs(v[1] - u[1])
+                            if dist < min_edge:
+                                min_edge = dist
+                                next_survivor = u
+                
+                if next_survivor:
+                    visitados.add(next_survivor)
+                    mst_costos += min_edge
+        
+        problem.heuristicInfo[tupla_survivors] = mst_costos
+    
+    mst_costos = problem.heuristicInfo[tupla_survivors]
+    
+    return min_distance + mst_costos

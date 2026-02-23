@@ -12,7 +12,7 @@ def tinyHouseSearch(problem: SearchProblem):
     s = Directions.SOUTH
     w = Directions.WEST
     return [s, s, w, s, w, w, s, w]
-
+    
 
 def depthFirstSearch(problem: SearchProblem):
     """
